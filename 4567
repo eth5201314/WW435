@@ -1,0 +1,28 @@
+def load_model():
+    print("Loading model")
+    return MusicGen.get_pretrained("melody")
+
+
+def predict(texts, melodies):
+    global MODEL
+    if MODEL is None:
+        MODEL = load_model()
+
+    duration = 12
+    MODEL.set_generation_params(duration=duration)
+
+    print(texts, melodies)
+    processed_melodies = []
+
+    target_sr = 32000
+    target_ac = 1
+    for melody in melodies:
+        if melody is None:
+            processed_melodies.append(None)
+        else:
+            sr, melody = melody[0], torch.from_numpy(melody[1]).to(MODEL.device).float().t()
+            if melody.dim() == 1:
+                melody = melody[None]
+            melody = melody[..., :int(sr * duration)]
+            melody = convert_audio(melody, sr, target_sr, target_ac)
+            processed_melodies.append(melody)
