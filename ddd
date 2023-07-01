@@ -15,4 +15,4 @@ def check_package_status(package, min_version):
     except ImportError:
         traceback.print_exc()
         package_status["up_to_date"] = False
-        package_status["version"] = ""
+
